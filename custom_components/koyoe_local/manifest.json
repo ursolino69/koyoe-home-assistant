@@ -1,6 +1,6 @@
 {
   "domain": "koyoe_local",
-  "name": "Koyoe für AUX-2",
+  "name": "Koyoe for AUX-2",
   "codeowners": [
     "@ursolino69"
   ],
@@ -16,5 +16,5 @@
   "requirements": [
     "serialx>=1.15.1"
   ],
-  "version": "0.4.0"
+  "version": "0.4.1"
 }

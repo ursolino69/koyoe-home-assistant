@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- Use the English display name **Koyoe for AUX-2** in Home Assistant and HACS.
+
 ## 0.4.0
 
 - First community preview of Koyoe für AUX-2 for Koyoe KY-EST20KH using Connect AUX-2 and Waveshare USB TO RS485 (B).

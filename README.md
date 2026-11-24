@@ -1,4 +1,4 @@
-# Koyoe für AUX-2
+# Koyoe for AUX-2
 
 Read PV production, battery status and inverter measurements from a **Koyoe KY-EST20KH** over a local RS-485 connection. The tested route uses **Home Assistant Connect AUX-2** and the **Waveshare USB TO RS485 (B)**. Setup is through the Home Assistant UI and requires no YAML or vendor cloud account.
 
@@ -16,9 +16,9 @@ The integration sends Modbus read requests only. It does not change inverter, ba
 ## Install
 
 1. Check the [hardware setup guide](docs/hardware.md) before wiring. Use Home Assistant 2026.11 or later. The tested installation used the `serialx` 1.15.1 library supplied by its Home Assistant version.
-2. In HACS / Marketplace, open **Custom repositories** and add `https://github.com/ursolino69/koyoe-home-assistant` as an **Integration**. Download **Koyoe für AUX-2**. If the preview is hidden, enable pre-releases in the download dialog.
-3. For manual installation, download and unpack `koyoe-local-0.4.0.zip` from [Releases](https://github.com/ursolino69/koyoe-home-assistant/releases). Copy the complete `custom_components/koyoe_local` folder into the `custom_components` folder of your Home Assistant configuration directory. The final path is `/config/custom_components/koyoe_local/manifest.json` on HA OS.
-4. Restart Home Assistant after a manual install or when replacing an existing version. Go to **Settings → Devices & services → Add integration → Koyoe für AUX-2**. Choose the AUX-2 **USB Serial Port**. The setup reads the inverter before saving the entry.
+2. In HACS / Marketplace, open **Custom repositories** and add `https://github.com/ursolino69/koyoe-home-assistant` as an **Integration**. Download **Koyoe for AUX-2**. If the preview is hidden, enable pre-releases in the download dialog.
+3. For manual installation, download and unpack `koyoe-local-0.4.1.zip` from [Releases](https://github.com/ursolino69/koyoe-home-assistant/releases). Copy the complete `custom_components/koyoe_local` folder into the `custom_components` folder of your Home Assistant configuration directory. The final path is `/config/custom_components/koyoe_local/manifest.json` on HA OS.
+4. Restart Home Assistant after a manual install or when replacing an existing version. Go to **Settings → Devices & services → Add integration → Koyoe for AUX-2**. Choose the AUX-2 **USB Serial Port**. The setup reads the inverter before saving the entry.
 5. Open the device and check **Datenerfassung** (`ok`), **Letzte erfolgreiche Abfrage** and **Erfolgreiche Abfragen seit Start**. Check that the success counter increases and compare live PV and battery readings with the inverter display or vendor app. Sensor labels in this preview are German. Setup dialogs are available in German and English.
 
 When upgrading the Smartdomo test build, back up its integration folder and keep the existing entry. This package keeps the `koyoe_local` domain and existing sensor identifiers. Restart after replacing the files. Before migrating the physical connection to a different HA instance, stop the old reader. Configure the AUX-2 on the destination instance and select its port there.
