@@ -1,0 +1,17 @@
+name: Report a problem
+description: Report a reproducible Koyoe integration or AUX-2 connection problem.
+body:
+  - type: textarea
+    id: setup
+    attributes:
+      label: Hardware and software
+      description: Include the exact inverter model and revision, inverter and AUX-2 firmware, Home Assistant Core version, integration version and adapter model.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the steps, expected result, actual result and relevant diagnostic counter or first error. Remove private network details, serial numbers, keys and unrelated logs before sharing.
+    validations:
+      required: true

@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Koyoe KY-EST20KH verbinden",
+        "description": "Wähle den USB Serial Port des Connect AUX-2, der mit deinem KY-EST20KH verbunden ist. Die Integration liest per Modbus RTU mit Adresse 247 und 9600 Baud (8N1). Beende vor dem Fortfahren andere Leseprogramme an diesem Bus.",
+        "data": {
+          "device": "Serieller Anschluss"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Keine gültigen Messwerte. Prüfe Anschluss, Adapter, Verkabelung und Modbus-Adresse. Beende andere Leseprogramme an diesem Bus."
+    },
+    "abort": {
+      "already_configured": "Dieser serielle Anschluss ist bereits eingerichtet."
+    }
+  }
+}

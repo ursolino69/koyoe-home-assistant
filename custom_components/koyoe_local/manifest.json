@@ -1,0 +1,20 @@
+{
+  "domain": "koyoe_local",
+  "name": "Koyoe",
+  "codeowners": [
+    "@ursolino69"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "esphome",
+    "usb"
+  ],
+  "documentation": "https://github.com/ursolino69/koyoe-home-assistant#readme",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/ursolino69/koyoe-home-assistant/issues",
+  "requirements": [
+    "serialx>=1.15.1"
+  ],
+  "version": "0.4.0"
+}
