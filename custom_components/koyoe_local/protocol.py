@@ -1,8 +1,16 @@
 """Narrow read-only KY-EST20KH bench protocol; no control registers."""
 import asyncio
+import logging
 import struct
 
 import serialx
+
+LOGGER = logging.getLogger(__name__)
+RESPONSE_TIMEOUT = 3
+INPUT_QUIET_TIME = 0.1
+INITIAL_DRAIN_TIMEOUT = 1
+INITIAL_DRAIN_MAX_BYTES = 1024
+INTER_REQUEST_DELAY = 0.5
 
 READINGS = {
     "status": (30087, ">H", 1),
@@ -83,22 +91,60 @@ class KoyoeClient:
             except Exception:
                 pass
 
+    async def _read_idle_input(self, quiet_time):
+        """Return received bytes, or None after an uninterrupted quiet period."""
+        try:
+            async with asyncio.timeout(quiet_time):
+                data = await self.reader.read(256)
+        except TimeoutError:
+            return None
+        if not data:
+            raise ConnectionError("Serial stream closed while waiting for silence")
+        return data
+
+    async def _settle_new_connection(self):
+        """Discard bounded input on a new stream before sending any request."""
+        discarded = 0
+        try:
+            async with asyncio.timeout(INITIAL_DRAIN_TIMEOUT):
+                while discarded < INITIAL_DRAIN_MAX_BYTES:
+                    data = await self._read_idle_input(INPUT_QUIET_TIME)
+                    if data is None:
+                        if discarded:
+                            LOGGER.debug("Discarded %d bytes before the first Koyoe request", discarded)
+                        return
+                    discarded += len(data)
+        except TimeoutError:
+            pass
+        raise ProtocolError("Serial input did not settle after connecting")
+
+    async def _require_quiet_input(self, quiet_time):
+        """Fail the cycle if bytes arrive while no reply is expected."""
+        self.phase = "receive_idle"
+        if await self._read_idle_input(quiet_time) is not None:
+            raise ProtocolError("Unexpected serial bytes while no reply was pending")
+
     async def read_all(self):
         try:
+            self.last_address = None
             if self.writer is None:
-                self.last_address = None
                 self.phase = "connect"
                 self.reader, self.writer = await asyncio.wait_for(
                     serialx.open_serial_connection(url=self.device, baudrate=9600), 15
                 )
+                self.phase = "settle_input"
+                await self._settle_new_connection()
+            else:
+                await self._require_quiet_input(INPUT_QUIET_TIME)
+
             readings = {}
             for key, (address, data_format, scale) in READINGS.items():
                 self.last_address = address
                 self.phase = "send"
                 self.writer.write(request(address))
-                await asyncio.wait_for(self.writer.drain(), 3)
+                await asyncio.wait_for(self.writer.drain(), RESPONSE_TIMEOUT)
                 self.phase = "receive_header"
-                header = await asyncio.wait_for(self.reader.readexactly(3), 3)
+                header = await asyncio.wait_for(self.reader.readexactly(3), RESPONSE_TIMEOUT)
                 if header[0] != 247 or header[1] not in (3, 0x83):
                     raise ProtocolError(f"Invalid header {header.hex()}")
                 byte_count = struct.calcsize(data_format)
@@ -106,7 +152,7 @@ class KoyoeClient:
                     raise ProtocolError(f"Invalid byte count {header[2]}, expected {byte_count}; header {header.hex()}")
                 size = 2 if header[1] == 0x83 else byte_count + 2
                 self.phase = "receive_data"
-                tail = await asyncio.wait_for(self.reader.readexactly(size), 3)
+                tail = await asyncio.wait_for(self.reader.readexactly(size), RESPONSE_TIMEOUT)
                 try:
                     raw = struct.unpack(data_format, parse(header + tail, byte_count))[0]
                 except ModbusException:
@@ -120,7 +166,9 @@ class KoyoeClient:
                         readings[key] = None
                     else:
                         readings[key] = value
-                await asyncio.sleep(0.5)
+                # Modbus RTU read replies carry no register address. If an
+                # extra reply appears here, even earlier values may be shifted.
+                await self._require_quiet_input(INTER_REQUEST_DELAY)
             self.phase = "validate"
             if not 0 <= readings["battery_soc"] <= 100:
                 raise ProtocolError("Battery SOC outside valid range")

@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from time import monotonic
 from .protocol import READINGS, ProtocolError
 
+RETRY_DELAY = 3
+
 DIAGNOSTIC_KEYS = {
     "last_success", "successful_polls", "unsupported_registers", "poll_cycles",
     "read_attempts", "failed_attempts", "failed_cycles", "retry_recoveries",
@@ -42,7 +44,7 @@ class DiagnosticRunner:
                 await self.client.close()
                 if attempt == 0:
                     # Entire cycle retried once, serialized, with a fresh connection.
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(RETRY_DELAY)
             else:
                 self.counters["successful_polls"] += 1
                 self.counters["consecutive_failed_cycles"] = 0

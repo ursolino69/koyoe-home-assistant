@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.2 (community preview)
+
+- Clear bounded pending input before the first request on a new connection. Reject a cycle if bytes arrive between requests, including after its final reply.
+- Wait three seconds before the existing single retry. Keep measurement values unavailable when both attempts fail.
+- Log the start of a sustained outage once. Diagnostic counters continue tracking failed attempts and cycles.
+
+The transport changes passed 15 automated tests. Field verification of their effect on intermittent outages is pending.
+
 ## 0.4.1
 
 - Use the English display name **Koyoe for AUX-2** in Home Assistant and HACS.

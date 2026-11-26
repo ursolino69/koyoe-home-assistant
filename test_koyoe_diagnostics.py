@@ -43,8 +43,9 @@ class DiagnosticTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_exactly_one_retry_and_recovery(self):
         client = Client([TimeoutError(), {'status': 2}])
-        with patch.object(r.asyncio, 'sleep', AsyncMock()):
+        with patch.object(r.asyncio, 'sleep', AsyncMock()) as sleep:
             data = await r.DiagnosticRunner(client).poll()
+        sleep.assert_awaited_once_with(3)
         self.assertEqual(client.read_all.await_count, 2)
         self.assertEqual(client.close.await_count, 1)
         self.assertEqual(data['retry_recoveries'], 1)
