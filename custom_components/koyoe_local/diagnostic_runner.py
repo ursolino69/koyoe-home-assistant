@@ -1,9 +1,11 @@
 """Bounded read-only diagnostic cycles, independent of Home Assistant."""
 import asyncio
+import logging
 from datetime import datetime, timezone
 from time import monotonic
 from .protocol import READINGS, ProtocolError
 
+LOGGER = logging.getLogger(__name__)
 RETRY_DELAY = 3
 
 DIAGNOSTIC_KEYS = {
@@ -41,6 +43,10 @@ class DiagnosticRunner:
                 self.last_error = str(error) if isinstance(error, ProtocolError) else type(error).__name__
                 self.last_error_register = self.client.last_address
                 self.last_error_phase = self.client.phase
+                LOGGER.debug(
+                    "Koyoe read attempt %d/2 failed: %s; register %s; phase %s",
+                    attempt + 1, self.last_error, self.last_error_register, self.last_error_phase,
+                )
                 await self.client.close()
                 if attempt == 0:
                     # Entire cycle retried once, serialized, with a fresh connection.

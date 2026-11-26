@@ -21,13 +21,17 @@ class KoyoeCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         data = await self.runner.poll()
+        state = data["collection_state"]
         if data["consecutive_failed_cycles"] == 1:
             LOGGER.warning("Koyoe cycle failed after two attempts: %s; register %s; phase %s",
                 data["last_error"], data["last_error_register"], data["last_error_phase"])
-        elif data["collection_state"] == "recovered":
+        elif state != "failed" and self.data and self.data["collection_state"] == "failed":
+            LOGGER.info(
+                "Koyoe communication restored%s",
+                " on fresh-connection retry" if state == "recovered" else "",
+            )
+        elif state == "recovered":
             LOGGER.info("Koyoe cycle recovered on fresh-connection retry")
-        elif data["collection_state"] == "ok" and self.data and self.data["collection_state"] == "failed":
-            LOGGER.info("Koyoe communication restored")
         return data
 
 

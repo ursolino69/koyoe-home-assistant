@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.3 (community preview)
+
+- Log each failed read attempt at DEBUG with the attempt number, error, register and phase. Enable debugging for `custom_components.koyoe_local` to collect these details during a field test.
+- Log when communication returns after an outage, including when the first successful cycle required a retry.
+- Use the original Koyoe logo in the README and Home Assistant, with its blue shield as the integration icon.
+
 ## 0.4.2 (community preview)
 
 - Clear bounded pending input before the first request on a new connection. Reject a cycle if bytes arrive between requests, including after its final reply.

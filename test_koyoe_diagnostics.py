@@ -28,9 +28,13 @@ class DiagnosticTests(unittest.IsolatedAsyncioTestCase):
     async def test_success_then_two_failures_clears_measurements_keeps_diagnostics(self):
         client = Client([{'status': 2}, TimeoutError(), OSError('secret URL')])
         runner = r.DiagnosticRunner(client)
-        with patch.object(r.asyncio, 'sleep', AsyncMock()):
+        with patch.object(r.asyncio, 'sleep', AsyncMock()), self.assertLogs(r.LOGGER, 'DEBUG') as logs:
             first = await runner.poll()
             failed = await runner.poll()
+        self.assertEqual([record.getMessage() for record in logs.records], [
+            'Koyoe read attempt 1/2 failed: TimeoutError; register 30087; phase receive_header',
+            'Koyoe read attempt 2/2 failed: OSError; register 30087; phase receive_header',
+        ])
         self.assertEqual(first['status'], 2)
         self.assertIsNone(failed['status'])
         self.assertEqual(failed['last_success'], first['last_success'])

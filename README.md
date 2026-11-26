@@ -1,5 +1,7 @@
 # Koyoe for AUX-2
 
+<img src="custom_components/koyoe_local/brand/logo.png" alt="Koyoe" width="172" />
+
 Read PV production, battery status and inverter measurements from a **Koyoe KY-EST20KH** over a local RS-485 connection. The tested route uses **Home Assistant Connect AUX-2** and the **Waveshare USB TO RS485 (B)**. Setup is through the Home Assistant UI and requires no YAML or vendor cloud account.
 
 **Status:** Community preview by Smartdomo. The hardware route was tested on one KY-EST20KH. On 24 November 2026, HA-Test recorded 911 consecutive successful read cycles after the restart, with zero failed attempts. That observation was on the test build preceding this package. Other Koyoe models, board revisions and firmware combinations need their own verification.
