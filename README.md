@@ -2,9 +2,13 @@
 
 <img src="custom_components/koyoe_local/brand/logo.png" alt="Koyoe" width="172" />
 
-Read PV production, battery status and inverter measurements from a **Koyoe KY-EST20KH** over a local RS-485 connection. The tested route uses **Home Assistant Connect AUX-2** and the **Waveshare USB TO RS485 (B)**. Setup is through the Home Assistant UI and requires no YAML or vendor cloud account.
+Read PV production, battery status and inverter measurements from a **Koyoe KY-EST20KH** over a local RS-485 connection. Set up the integration in the Home Assistant UI without YAML or a vendor cloud account.
 
-**Status:** Community preview by Smartdomo. The hardware route was tested on one KY-EST20KH. On 24 November 2026, HA-Test recorded 911 consecutive successful read cycles after the restart, with zero failed attempts. That observation was on the test build preceding this package. Other Koyoe models, board revisions and firmware combinations need their own verification.
+**Status:** Community preview by Smartdomo. Hardware-tested on one **KY-EST20KH** using **Home Assistant Connect AUX-2** and **Waveshare USB TO RS485 (B)** at **Modbus address 247**. Confirm the PARA terminal assignment for your hardware revision before wiring. [Hardware guide](docs/hardware.md)
+
+**Other KY-ESTxxKH models awaiting hardware verification:** KY-EST06KH, KY-EST08KH, KY-EST10KH, KY-EST12KH, KY-EST15KH and KY-EST17KH.
+
+On 24 November 2026, a build preceding v0.4.3 recorded 911 consecutive successful read cycles on the test system, with zero failed attempts. This is the historical test baseline.
 
 | Readings | Examples |
 | --- | --- |
@@ -17,11 +21,23 @@ The integration sends Modbus read requests only. It does not change inverter, ba
 
 ## Install
 
-1. Check the [hardware setup guide](docs/hardware.md) before wiring. Use Home Assistant 2026.11 or later. The tested installation used the `serialx` 1.15.1 library supplied by its Home Assistant version.
-2. In HACS / Marketplace, open **Custom repositories** and add `https://github.com/ursolino69/koyoe-home-assistant` as an **Integration**. Download **Koyoe for AUX-2**. If the preview is hidden, enable pre-releases in the download dialog.
-3. For manual installation, download and unpack the `koyoe-local-<version>.zip` asset from [Releases](https://github.com/ursolino69/koyoe-home-assistant/releases). Copy the complete `custom_components/koyoe_local` folder into the `custom_components` folder of your Home Assistant configuration directory. The final path is `/config/custom_components/koyoe_local/manifest.json` on HA OS.
-4. Restart Home Assistant after a manual install or when replacing an existing version. Go to **Settings → Devices & services → Add integration → Koyoe for AUX-2**. Choose the AUX-2 **USB Serial Port**. The setup reads the inverter before saving the entry.
-5. Open the device and check **Datenerfassung** (`ok`), **Letzte erfolgreiche Abfrage** and **Erfolgreiche Abfragen seit Start**. Check that the success counter increases and compare live PV and battery readings with the inverter display or vendor app. Sensor labels in this preview are German. Setup dialogs are available in German and English.
+Use Home Assistant **2026.11 or later**. Connect the inverter and add the AUX-2 in ESPHome first. [Hardware setup guide](docs/hardware.md)
+
+### Marketplace
+
+1. In Home Assistant, open **Settings → Marketplace → Add from link**. Enter `https://github.com/ursolino69/koyoe-home-assistant`. Connect your GitHub account when prompted and select **Integration** if the Marketplace asks for a type.
+2. Open **Koyoe for AUX-2** and select **v0.4.3** if offered. It is a GitHub pre-release. To enable pre-releases, open the repository's device under **Settings → Devices & services → Marketplace**, enable its **Pre-release** entity and turn on the switch. If that device or version is unavailable on your first install, use the ZIP below. [Marketplace documentation](https://www.home-assistant.io/integrations/marketplace/)
+
+After a Marketplace update, restart Home Assistant to apply it.
+
+### Manual ZIP installation
+
+Download the ZIP and unpack it. Copy the complete `custom_components/koyoe_local` folder into your Home Assistant configuration directory's `custom_components` folder. On HA OS, verify that `/config/custom_components/koyoe_local/manifest.json` exists. Restart Home Assistant. [Download v0.4.3 ZIP](https://github.com/ursolino69/koyoe-home-assistant/releases/download/v0.4.3/koyoe-local-0.4.3.zip)
+
+### Add the integration
+
+1. Open **Settings → Devices & services → Add integration → Koyoe for AUX-2**. Select the USB adapter entry under the name of your AUX-2. Home Assistant may label it **USB Serial Port** or show a longer identifier containing `USB_Single_Serial`. The setup reads the inverter before saving the entry.
+2. Open the device and check **Datenerfassung** (`ok`), **Letzte erfolgreiche Abfrage** and **Erfolgreiche Abfragen seit Start**. Check that the success counter increases and compare live PV and battery readings with the inverter display or vendor app. Sensor labels in this preview are German. Setup dialogs are available in German and English.
 
 When upgrading the Smartdomo test build, back up its integration folder and keep the existing entry. This package keeps the `koyoe_local` domain and existing sensor identifiers. Restart after replacing the files. Before migrating the physical connection to a different HA instance, stop the old reader. Configure the AUX-2 on the destination instance and select its port there.
 
@@ -35,7 +51,7 @@ This preview covers solar generation. Grid import, grid export and battery charg
 
 | What you see | What to check |
 | --- | --- |
-| USB Serial Port is missing | Confirm that AUX-2 is online in ESPHome and the exact Waveshare **(B)** model is plugged directly into USB-A. |
+| The AUX-2 USB port is missing | Look for **USB Serial Port** or `USB_Single_Serial` under your AUX-2. Confirm that the AUX-2 is online in ESPHome and the Waveshare **(B)** is plugged directly into USB-A. |
 | Setup cannot read the inverter | Verify the PARA pinout for your revision, A/B polarity and address 247. Stop any other Modbus reader on this port. |
 | Old `serialx==1.11.0` requirement conflict | Check that you replaced the complete legacy folder and restarted. This release requests `serialx>=1.15.1`. |
 | Sensors briefly unavailable | Check the diagnostic counters and last error phase. A failed cycle is retried once with a fresh connection. If both attempts fail, the cycle’s measurements become unavailable and collection resumes on the next scheduled cycle. |

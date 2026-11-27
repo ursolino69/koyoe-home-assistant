@@ -1,6 +1,6 @@
 # KY-EST20KH hardware setup
 
-**Tested path:** Koyoe KY-EST20KH → PARA RS-485 → Waveshare USB TO RS485 (B) → AUX-2 USB-A → local network → Home Assistant ESPHome integration → Koyoe integration.
+**Tested path:** Koyoe KY-EST20KH → PARA RS-485 → Waveshare USB TO RS485 (B) → AUX-2 USB-A → local network → Home Assistant ESPHome integration → Koyoe integration. The preview uses **Modbus address 247**, **9600 baud** and **8N1**.
 
 ## Parts and checks before wiring
 
@@ -23,8 +23,8 @@ Use the printed labels and the confirmed terminal numbering. Cable colours are a
 
 1. With the inverter made safe by your installer, connect the data pair as above. Plug the Waveshare adapter directly into **USB-A on the AUX-2**. The AUX-2's two 3.5 mm serial ports are RS-232.
 2. Power and join AUX-2 to the network by Ethernet or Wi-Fi. Add the AUX-2 to Home Assistant through **ESPHome**. Follow the [Nabu Casa Modbus guide](https://support.nabucasa.com/hc/en-us/articles/40528804425245-Using-Connect-AUX-2-with-Modbus-devices).
-3. In Home Assistant open **Settings → Devices & services → ESPHome → Connect AUX-2**. Verify that **USB Serial Port** is available. Stop any other active Modbus client on the same bus, including a separate test HA instance.
-4. Install Koyoe and select that port in the [integration setup](../README.md#install). The profile uses **Modbus RTU, device address 247, 9600 baud, 8N1**, with function 03 to read measurements. If your inverter uses a different address, this version will not read it. Verify the address in the inverter display or with the installer.
+3. In Home Assistant open **Settings → Devices & services → ESPHome → Connect AUX-2**. Verify that the USB adapter is available. In the port selector, identify it by your AUX-2 device name and either **USB Serial Port** or a longer identifier containing `USB_Single_Serial`. Stop any other active Modbus client on the same bus, including a separate test HA instance.
+4. Verify Modbus address **247** on the inverter display or with the installer. Install Koyoe and select the AUX-2 USB port. The profile uses Modbus RTU function 03 to read measurements. [Integration setup](../README.md#install)
 5. Check the success counter across at least two automatic updates. Compare battery charge, temperature and PV values with the display or app. Watch the failed-cycle count over a day before treating the data as dependable. A listed serial port only confirms that Home Assistant sees the bridge.
 
 Use [official AUX-2 troubleshooting](https://support.nabucasa.com/hc/en-us/articles/40528982833565-Troubleshooting) for issues before the serial port appears. For Koyoe-specific issues, follow the [project troubleshooting table](../README.md#troubleshooting).
